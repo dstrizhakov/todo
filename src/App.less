@@ -1,0 +1,79 @@
+.App {
+  text-align: center;
+  margin: 0 auto;
+
+  background-color: #282c34;
+  min-height: 100vh;
+}
+
+.App-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  h1 {
+    font-size: calc(24px + 2vmin);
+
+    margin: 15px 0;
+    letter-spacing: 1px;
+  }
+}
+.App-body {
+  margin: 0 auto;
+  max-width: 800px;
+  color: white;
+  .App-form {
+    background-color: rgba(65, 79, 114, 0.29);
+    padding: 10px;
+    border: 1px solid white;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    textarea, input {
+      padding: 5px;
+      width: 50vw;
+    }
+
+    button {
+      padding: 5px;
+      font-size: 14px;
+    }
+  }
+}
+
+.todolist {
+  margin-top: 20px;
+
+}
+.todo {
+  border: 1px solid white;
+  border-radius: 10px;
+  background-color: rgba(65, 79, 114, 0.29);
+  margin-bottom: 20px;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  .todo-main {
+    width: 50%;
+    text-align: left;
+  }
+  .todo-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
+    .red{
+      color: red;
+    }
+    .green{
+      color: green;
+    }
+  }
+}
+
+
