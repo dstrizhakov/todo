@@ -33,12 +33,18 @@
     justify-content: center;
     gap: 5px;
     textarea, input {
-      padding: 5px;
+padding: 10px;
       width: 50vw;
+    }
+    .form-data {
+      input {
+      }
+
     }
 
     button {
       padding: 5px;
+      margin: 5px;
       font-size: 14px;
     }
   }
@@ -60,6 +66,15 @@
   .todo-main {
     width: 50%;
     text-align: left;
+    .todo-title {
+      text-align: center;
+    }
+    .todo-timestamp{
+      font-size: 12px;
+      p {
+        margin: 3px;
+      }
+    }
   }
   .todo-progress {
     display: flex;
@@ -68,10 +83,10 @@
     align-items: center;
     justify-content: center;
     .red{
-      color: red;
+      color: #ffe641;
     }
     .green{
-      color: green;
+      color: #00ff00;
     }
   }
 }
