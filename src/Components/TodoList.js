@@ -22,7 +22,9 @@ const TodoList = ({toTimestamp}) => {
             querySnapshot.forEach((doc)=>{
                 todosArray.push({ ...doc.data(), id: doc.id });
             });
-            setTodos(todosArray);
+            const result = [...todosArray].sort((a,b) => a.created.seconds - b.created.seconds)
+            console.log(result)
+            setTodos(result);
         })
         return () => unsub();
     }, []);
