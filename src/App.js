@@ -1,17 +1,21 @@
-
 import './App.less';
-import { useState } from "react";
+import {useState} from "react";
 import {db} from "./firebase_config";
 import { serverTimestamp } from "firebase/firestore";
 import { collection, addDoc } from "firebase/firestore";
 import TodoList from "./Components/TodoList";
-
+import { storage } from "./firebase_config";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { v4 } from "uuid";
+import File from "./Components/File";
 
 
 function App() {
     const [todoTitle, setTodoTitle] = useState("");
     const [todoDetails, setTodoDetails] = useState("");
     const [todoDeadline, setTodoDeadline] = useState("");
+    const [file, setFile] = useState(null);
+
 
     const toTimestamp = (strDate) => {
         var datum = Date.parse(strDate);
@@ -21,10 +25,31 @@ function App() {
         }
     }
 
+    const handleChangeFile = e => {
+        setFile(e.target.files[0])
+    }
+
+
+    const uploadFile =  async () => {
+        if(file === null) {
+            return ""
+        } else {
+            const fileRef = await ref(storage, `files/${file.name + v4()}`);
+            await uploadBytes (fileRef, file);
+            const url = await getDownloadURL(fileRef);
+            return url
+        }
+
+    }
+
     const addTodo = async (event) => {
         event.preventDefault();
+        /*Upload file*/
+        const url = await uploadFile();
+        /*Create todo with file url*/
         if(todoTitle.length > 3){
             await addDoc(collection(db, "todos"), {
+                files: url,
                 isdone: false,
                 created: serverTimestamp(),
                 deadline: toTimestamp(todoDeadline),
@@ -32,7 +57,7 @@ function App() {
                 details: todoDetails,
             })
                 .then(() => {
-                    console.log('Message submitted 👍' );
+                    console.log('Todo submitted!' );
                 })
                 .catch((error) => {
                     console.log(error.message);
@@ -40,11 +65,9 @@ function App() {
             setTodoDetails('');
             setTodoTitle('');
             setTodoDeadline('')
+
         }
     }
-
-
-
 
   return (
     <div className="App">
@@ -56,7 +79,7 @@ function App() {
                 <input type="text" value={todoTitle} onChange={e => setTodoTitle(e.target.value)} placeholder="Todo title"/>
                 <textarea name="Details" value={todoDetails} onChange={(e)=> setTodoDetails(e.target.value)} placeholder="Todo details" id=""  rows="5"></textarea>
                 <div className="form-data">
-                    <input type="file"/>
+                    <input type="file" onChange={ e => handleChangeFile(e)}/>
                     <input type="date" value={todoDeadline} onChange={e => setTodoDeadline(e.target.value)}/>
                 </div>
                 <button type="submit" onClick={event =>addTodo(event)}>Create todo</button>

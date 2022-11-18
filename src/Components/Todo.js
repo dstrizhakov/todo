@@ -1,11 +1,13 @@
 import React, {useState} from 'react';
+import File from "./File";
 
 const Todo = ({todo, deleteTodo, toggleComplete, editTodo}) => {
 
-    const [editMode, setEditMode] = useState(false)
-    const [newDeadline, setNewDeadline] = useState({})
-    const [newTitle, setNewTitle] = useState('New title')
-    const [newDetails, setNewDetails] = useState('New details')
+    const [editMode, setEditMode] = useState(false);
+    const [newDeadline, setNewDeadline] = useState({});
+    const [newTitle, setNewTitle] = useState('New title');
+    const [newDetails, setNewDetails] = useState('New details');
+    const [newFiles, setNewFiles] = useState();
 
 
 
@@ -63,7 +65,12 @@ const Todo = ({todo, deleteTodo, toggleComplete, editTodo}) => {
                         :<p>Deadline: no date</p>
                     }
                 </div>
-
+            </div>
+            <div className="todo-files">
+                {todo.files
+                    ? <File url={todo.files}/>
+                    : <p></p>
+                }
             </div>
             <div className="todo-progress">
                 <div >{todo.isdone

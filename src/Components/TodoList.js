@@ -8,7 +8,9 @@ import {
     updateDoc,
     deleteDoc,
 } from "firebase/firestore";
+import { orderByChild } from "firebase/database";
 import {db} from "../firebase_config";
+
 
 const TodoList = ({toTimestamp}) => {
     const [todos, setTodos] = useState([]);
@@ -52,7 +54,7 @@ const TodoList = ({toTimestamp}) => {
                     editTodo={editTodo}
                     toggleComplete={toggleComplete}
                 />))
-                : <h2>"Todo list is empty"</h2>
+                : <h2>Todo list is empty</h2>
             }
         </div>
     );
