@@ -62,7 +62,7 @@ function App() {
                 <button type="submit" onClick={event =>addTodo(event)}>Create todo</button>
             </form>
             <section className="App-todolist">
-                <TodoList/>
+                <TodoList toTimestamp={toTimestamp}/>
             </section>
         </main>
     </div>

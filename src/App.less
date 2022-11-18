@@ -1,7 +1,6 @@
 .App {
   text-align: center;
   margin: 0 auto;
-
   background-color: #282c34;
   min-height: 100vh;
 }
@@ -13,7 +12,6 @@
   justify-content: flex-start;
   h1 {
     font-size: calc(24px + 2vmin);
-
     margin: 15px 0;
     letter-spacing: 1px;
   }
@@ -23,18 +21,20 @@
   max-width: 800px;
   color: white;
   .App-form {
+    overflow: hidden;
     background-color: rgba(65, 79, 114, 0.29);
     padding: 10px;
     border: 1px solid white;
-    border-radius: 10px;
+
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 5px;
     textarea, input {
-padding: 10px;
+      padding: 10px;
       width: 50vw;
+      border-radius: 8px;
     }
     .form-data {
       input {
@@ -43,7 +43,7 @@ padding: 10px;
     }
 
     button {
-      padding: 5px;
+      padding: 10px;
       margin: 5px;
       font-size: 14px;
     }
@@ -56,12 +56,12 @@ padding: 10px;
 }
 .todo {
   border: 1px solid white;
-  border-radius: 10px;
   background-color: rgba(65, 79, 114, 0.29);
   margin-bottom: 20px;
   padding: 10px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 10px;
   .todo-main {
     width: 50%;
@@ -87,6 +87,46 @@ padding: 10px;
     }
     .green{
       color: #00ff00;
+    }
+  }
+  .todo-control {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    button{
+      min-width: 100px;
+      padding: 10px;
+    }
+  }
+}
+.todo-edit {
+  position: fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  background-color: rgb(35, 47, 70);
+  .edit-data {
+    display: flex;
+    flex-direction: column;
+  }
+  .edit-form {
+    padding: 10px;
+    border: 1px solid white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    textarea, input {
+      width: 30vw;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    button {
+      padding: 10px;
+      margin: 5px;
+      font-size: 14px;
     }
   }
 }

@@ -10,7 +10,7 @@ import {
 } from "firebase/firestore";
 import {db} from "../firebase_config";
 
-const TodoList = () => {
+const TodoList = ({toTimestamp}) => {
     const [todos, setTodos] = useState([]);
 
     useEffect(()=>{
@@ -28,6 +28,13 @@ const TodoList = () => {
     const deleteTodo = async (id) => {
         await deleteDoc(doc(db, "todos", id));
     };
+    const editTodo = async (todo, deadline, title, details) => {
+        await updateDoc(doc(db, "todos", todo.id), {
+            deadline: toTimestamp(deadline),
+            todo: title,
+            details: details,
+        });
+    };
     const toggleComplete = async (todo) => {
         await updateDoc(doc(db, "todos", todo.id), {
             isdone:!todo.isdone
@@ -37,14 +44,15 @@ const TodoList = () => {
 
     return (
         <div className="todolist">
-            {!!todos
+            {(todos.length !== 0)
                 ? (todos.map(todo => <Todo
                     key={todo.id}
                     todo={todo}
                     deleteTodo={deleteTodo}
+                    editTodo={editTodo}
                     toggleComplete={toggleComplete}
                 />))
-                : "Todos list is empty"
+                : <h2>"Todo list is empty"</h2>
             }
         </div>
     );
