@@ -1,7 +1,7 @@
 import React from 'react';
 import File from "./File";
 
-const Todo = ({todo, deleteTodo, toggleComplete, editCurrentTodo}) => {
+const Todo = ({todo, deleteTodo, toggleComplete, editCurrentTodo, deleteFile}) => {
 
     return (
         <>
@@ -24,7 +24,7 @@ const Todo = ({todo, deleteTodo, toggleComplete, editCurrentTodo}) => {
             </div>
             <div className="todo-files">
                 {todo.files
-                    ? <File url={todo.files} name="file"/>
+                    ? <File edit={false} deleteFile={deleteFile} url={todo.files} name="file"/>
                     : <p></p>
                 }
             </div>

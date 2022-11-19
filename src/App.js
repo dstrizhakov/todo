@@ -5,7 +5,7 @@ import {deleteDoc, doc, onSnapshot, query, serverTimestamp, updateDoc} from "fir
 import { collection, addDoc } from "firebase/firestore";
 import TodoList from "./Components/TodoList";
 import { storage } from "./firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { v4 } from "uuid";
 import File from "./Components/File";
 
@@ -47,18 +47,33 @@ function App() {
         if(file === null) {
             return ""
         } else {
-            const fileRef = await ref(storage, `files/${file.name + v4()}`);
+            const path = `files/${file.name + v4()}`
+            const fileRef = await ref(storage, path);
             await uploadBytes (fileRef, file);
             const url = await getDownloadURL(fileRef);
-            return url
+            return {url, path}
         }
 
     };
+    const deleteFile = async () => {
+        const fileRef = await ref(storage, currentTodoRef.fileRef);
+        updateDoc(doc(db, "todos", currentTodoRef.id), {
+            fileRef: null,
+            files: "",
+        });
+        deleteObject(fileRef).then(() => {
+            // File deleted successfully
+            console.log("File deleted successfully");
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
     const addTodo = async (event) => {
         event.preventDefault();
-        const url = await uploadFile();
+        const {url, path} = await uploadFile();
         if(todoTitle.length > 3){
             await addDoc(collection(db, "todos"), {
+                fileRef: path,
                 files: url,
                 isdone: false,
                 created: serverTimestamp(),
@@ -115,7 +130,6 @@ function App() {
         setTodoDeadline(dateString)
     }
 
-console.log(currentTodoRef);
   return (
     <div className="App">
       <header className="App-header">
@@ -127,10 +141,14 @@ console.log(currentTodoRef);
                 <textarea name="Details" value={todoDetails} onChange={(e)=> setTodoDetails(e.target.value)} placeholder="Todo details" id=""  rows="5"></textarea>
                 <div className="form-data">
                     <input type="file" onChange={ e => handleChangeFile(e)}/>
-                    <div className="form-files">
-                        {(editTodo&&(currentTodoRef.files !== ""))&&<File edit={true} url={currentTodoRef.files} name="file"/>
+                    <div>
+                        {(editTodo&&(currentTodoRef.files !== ""))&&
+                            <div className="form-files"> <File edit={true} url={currentTodoRef.files} name="file"/>
+                                <button onClick={deleteFile}>Detele</button>
+                            </div>
                         }
                     </div>
+
                 </div>
                 <input type="date" value={todoDeadline} onChange={e => setTodoDeadline(e.target.value)}/>
                 {
@@ -149,6 +167,7 @@ console.log(currentTodoRef);
                     updateTodo={updateTodo}
                     toggleComplete={toggleComplete}
                     editCurrentTodo={editCurrentTodo}
+                    deleteFile={deleteFile}
                 />
             </section>
         </main>
