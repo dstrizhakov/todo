@@ -43,6 +43,12 @@ const Todo = ({todo, deleteTodo, toggleComplete, editTodo}) => {
                     <textarea name="Details" value={newDetails} onChange={(e)=> setNewDetails(e.target.value)} placeholder="Todo details" id=""  rows="5"></textarea>
                     <div className="edit-data">
                         <input type="file"/>
+                        <div>
+                            {todo.files
+                                ? <File url={todo.files} name="file" edit={true}/>
+                                : <></>
+                            }
+                        </div>
                         <input type="date" value={newDeadline} onChange={e => setNewDeadline(e.target.value)}/>
                     </div>
                     <button type="submit" onClick={e => writeEdit(e)}>Save todo</button>
@@ -64,18 +70,24 @@ const Todo = ({todo, deleteTodo, toggleComplete, editTodo}) => {
                         ?<p>Deadline: {new Date(todo.deadline.seconds*1000).toString()}</p>
                         :<p>Deadline: no date</p>
                     }
+
+
                 </div>
             </div>
             <div className="todo-files">
                 {todo.files
-                    ? <File url={todo.files}/>
+                    ? <File url={todo.files} name="file"/>
                     : <p></p>
                 }
             </div>
             <div className="todo-progress">
                 <div >{todo.isdone
                 ?<p className="green">Done</p>
-                :<p className="red">In progress</p>
+                :<p className="yellow">In progress</p>
+                }
+                {((todo.deadline.seconds - todo.created.seconds) < 0)
+                        ? <p className="red">Task expired!</p>
+                        : <p></p>
                 }
                 </div>
 

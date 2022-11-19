@@ -7,7 +7,7 @@ import TodoList from "./Components/TodoList";
 import { storage } from "./firebase_config";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 } from "uuid";
-import File from "./Components/File";
+
 
 
 function App() {
@@ -29,7 +29,6 @@ function App() {
         setFile(e.target.files[0])
     }
 
-
     const uploadFile =  async () => {
         if(file === null) {
             return ""
@@ -40,6 +39,18 @@ function App() {
             return url
         }
 
+    }
+
+    const deleteFile = async (url) => {
+        const fileRefDel = storage.refFromURL(url);
+        // Delete the file using the delete() method
+        fileRefDel.delete().then(function () {
+            // File deleted successfully
+            console.log("File Deleted")
+        }).catch(function (error) {
+            // Some Error occurred
+            console.log(error)
+        });
     }
 
     const addTodo = async (event) => {
