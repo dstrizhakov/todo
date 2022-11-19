@@ -16,6 +16,9 @@ function App() {
     const [todoDeadline, setTodoDeadline] = useState("");
     const [file, setFile] = useState(null);
     const [todos, setTodos] = useState([]);
+    const [editTodo, setEditTodo] = useState(false);
+    const [currentTodoId, setCurrentTodoId] = useState(0);
+
 
     useEffect(() => {
         const q = query(collection(db,"todos"));
@@ -30,6 +33,7 @@ function App() {
         return () => unsub();
     }, []);
 
+
     const toTimestamp = (strDate) => {
         var datum = Date.parse(strDate);
         return {
@@ -37,8 +41,8 @@ function App() {
             nanoseconds: 0
         }
     }
-    const handleChangeFile = e => {
-            setFile(e.target.files[0]);
+    const handleChangeFile = (event) => {
+            setFile(event.target.files[0]);
     }
     const uploadFile =  async () => {
         if(file === null) {
@@ -53,9 +57,7 @@ function App() {
     };
     const addTodo = async (event) => {
         event.preventDefault();
-        /*Upload file*/
         const url = await uploadFile();
-        /*Create todo with file url*/
         if(todoTitle.length > 3){
             await addDoc(collection(db, "todos"), {
                 files: url,
@@ -80,18 +82,39 @@ function App() {
     const deleteTodo = async (id) => {
         await deleteDoc(doc(db, "todos", id));
     };
-    const updateTodo= async (todo, deadline, title, details) => {
-        await updateDoc(doc(db, "todos", todo.id), {
-            deadline: toTimestamp(deadline),
-            todo: title,
-            details: details,
+    const updateTodo= async (event) => {
+        event.preventDefault();
+        await updateDoc(doc(db, "todos", currentTodoId), {
+            deadline: toTimestamp(todoDeadline),
+            todo: todoTitle,
+            details: todoDetails,
         });
+        setEditTodo(false);
+        setTodoDetails('');
+        setTodoTitle('');
+        setTodoDeadline('')
     };
     const toggleComplete = async (todo) => {
         await updateDoc(doc(db, "todos", todo.id), {
             isdone:!todo.isdone
         });
     };
+    const editCurrentTodo = (currentTodo) => {
+        setEditTodo(true);
+        setCurrentTodoId(currentTodo.id)
+        setFile(currentTodo.files)
+        setTodoTitle(currentTodo.todo)
+        setTodoDetails(currentTodo.details)
+        const dateFormat = new Date(currentTodo.deadline.seconds * 1000)
+        const year = dateFormat.getFullYear()
+        const month = (dateFormat.getMonth()+1)
+        const day = dateFormat.getDate()
+        const dateString = year.toString() + "-" +
+            (month.toString().length === 1 ? +"0"+ month.toString() : month.toString())
+            + "-" + (day.toString().length === 1 ? +"0" + day.toString(): day.toString())
+
+        setTodoDeadline(dateString)
+    }
 
 
   return (
@@ -107,10 +130,23 @@ function App() {
                     <input type="file" onChange={ e => handleChangeFile(e)}/>
                     <input type="date" value={todoDeadline} onChange={e => setTodoDeadline(e.target.value)}/>
                 </div>
-                <button type="submit" onClick={event =>addTodo(event)}>Create todo</button>
+                {
+                    editTodo
+                        ?<button type="submit" onClick={event =>{updateTodo(event)}}>Update todo</button>
+                        :<button type="submit" onClick={event =>{addTodo(event)}}>Create todo</button>
+                }
+
+
             </form>
             <section className="App-todolist">
-                <TodoList todos={todos} toTimestamp={toTimestamp} deleteTodo={deleteTodo} updateTodo={updateTodo} toggleComplete={toggleComplete}/>
+                <TodoList
+                    todos={todos}
+                    toTimestamp={toTimestamp}
+                    deleteTodo={deleteTodo}
+                    updateTodo={updateTodo}
+                    toggleComplete={toggleComplete}
+                    editCurrentTodo={editCurrentTodo}
+                />
             </section>
         </main>
     </div>

@@ -3,7 +3,7 @@ import Todo from "./Todo";
 
 
 
-const TodoList = ({ todos, deleteTodo, updateTodo, toggleComplete }) => {
+const TodoList = ({ todos, deleteTodo, updateTodo, toggleComplete, editCurrentTodo}) => {
 
     return (
         <div className="todolist">
@@ -14,6 +14,7 @@ const TodoList = ({ todos, deleteTodo, updateTodo, toggleComplete }) => {
                     deleteTodo={deleteTodo}
                     updateTodo={updateTodo}
                     toggleComplete={toggleComplete}
+                    editCurrentTodo={editCurrentTodo}
                 />))
                 : <h2>Todo list is empty</h2>
             }
