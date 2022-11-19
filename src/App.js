@@ -1,7 +1,7 @@
 import './App.less';
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {db} from "./firebase";
-import {deleteDoc, doc, serverTimestamp, updateDoc} from "firebase/firestore";
+import {deleteDoc, doc, onSnapshot, query, serverTimestamp, updateDoc} from "firebase/firestore";
 import { collection, addDoc } from "firebase/firestore";
 import TodoList from "./Components/TodoList";
 import { storage } from "./firebase";
@@ -15,7 +15,20 @@ function App() {
     const [todoDetails, setTodoDetails] = useState("");
     const [todoDeadline, setTodoDeadline] = useState("");
     const [file, setFile] = useState(null);
+    const [todos, setTodos] = useState([]);
 
+    useEffect(() => {
+        const q = query(collection(db,"todos"));
+        const unsub = onSnapshot(q, (querySnapshot)=>{
+            let todosArray = [];
+            querySnapshot.forEach((doc)=>{
+                todosArray.push({ ...doc.data(), id: doc.id });
+            });
+            todosArray = [...todosArray].sort((a,b) => a.created.seconds - b.created.seconds)
+            setTodos(todosArray);
+        })
+        return () => unsub();
+    }, []);
 
     const toTimestamp = (strDate) => {
         var datum = Date.parse(strDate);
@@ -67,7 +80,7 @@ function App() {
     const deleteTodo = async (id) => {
         await deleteDoc(doc(db, "todos", id));
     };
-    const editTodo = async (todo, deadline, title, details) => {
+    const updateTodo= async (todo, deadline, title, details) => {
         await updateDoc(doc(db, "todos", todo.id), {
             deadline: toTimestamp(deadline),
             todo: title,
@@ -97,7 +110,7 @@ function App() {
                 <button type="submit" onClick={event =>addTodo(event)}>Create todo</button>
             </form>
             <section className="App-todolist">
-                <TodoList toTimestamp={toTimestamp} deleteTodo={deleteTodo} editTodo={editTodo} toggleComplete={toggleComplete}/>
+                <TodoList todos={todos} toTimestamp={toTimestamp} deleteTodo={deleteTodo} updateTodo={updateTodo} toggleComplete={toggleComplete}/>
             </section>
         </main>
     </div>

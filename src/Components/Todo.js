@@ -1,13 +1,13 @@
 import React, {useState} from 'react';
 import File from "./File";
-import {storage} from "../firebase";
 
-const Todo = ({todo, deleteTodo, toggleComplete, editTodo}) => {
+const Todo = ({todo, deleteTodo, toggleComplete, updateTodo}) => {
 
     const [editMode, setEditMode] = useState(false);
     const [newDeadline, setNewDeadline] = useState({});
     const [newTitle, setNewTitle] = useState('New title');
     const [newDetails, setNewDetails] = useState('New details');
+    const [newFiles, setNewFiles] = useState();
 
     const setEdit = () => {
         /*Convert unix time to date*/
@@ -27,7 +27,7 @@ const Todo = ({todo, deleteTodo, toggleComplete, editTodo}) => {
     }
     const writeEdit = (e) => {
         e.preventDefault();
-        editTodo(todo, newDeadline, newTitle, newDetails);
+        updateTodo(todo, newDeadline, newTitle, newDetails);
         setEditMode(false);
     }
 
