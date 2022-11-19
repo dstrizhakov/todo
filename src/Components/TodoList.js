@@ -8,11 +8,10 @@ import {
     updateDoc,
     deleteDoc,
 } from "firebase/firestore";
-import { orderByChild } from "firebase/database";
-import {db} from "../firebase_config";
+import {db} from "../firebase";
 
 
-const TodoList = ({toTimestamp}) => {
+const TodoList = ({ deleteTodo, editTodo, toggleComplete }) => {
     const [todos, setTodos] = useState([]);
 
     useEffect(()=>{
@@ -23,28 +22,10 @@ const TodoList = ({toTimestamp}) => {
                 todosArray.push({ ...doc.data(), id: doc.id });
             });
             const result = [...todosArray].sort((a,b) => a.created.seconds - b.created.seconds)
-            console.log(result)
             setTodos(result);
         })
         return () => unsub();
     }, []);
-
-    const deleteTodo = async (id) => {
-        await deleteDoc(doc(db, "todos", id));
-    };
-    const editTodo = async (todo, deadline, title, details) => {
-        await updateDoc(doc(db, "todos", todo.id), {
-            deadline: toTimestamp(deadline),
-            todo: title,
-            details: details,
-        });
-    };
-    const toggleComplete = async (todo) => {
-        await updateDoc(doc(db, "todos", todo.id), {
-            isdone:!todo.isdone
-        });
-
-    };
 
     return (
         <div className="todolist">

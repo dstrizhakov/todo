@@ -1,10 +1,10 @@
 import './App.less';
 import {useState} from "react";
-import {db} from "./firebase_config";
-import { serverTimestamp } from "firebase/firestore";
+import {db} from "./firebase";
+import {deleteDoc, doc, serverTimestamp, updateDoc} from "firebase/firestore";
 import { collection, addDoc } from "firebase/firestore";
 import TodoList from "./Components/TodoList";
-import { storage } from "./firebase_config";
+import { storage } from "./firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 } from "uuid";
 
@@ -24,11 +24,9 @@ function App() {
             nanoseconds: 0
         }
     }
-
     const handleChangeFile = e => {
-        setFile(e.target.files[0])
+            setFile(e.target.files[0]);
     }
-
     const uploadFile =  async () => {
         if(file === null) {
             return ""
@@ -39,20 +37,7 @@ function App() {
             return url
         }
 
-    }
-
-    const deleteFile = async (url) => {
-        const fileRefDel = storage.refFromURL(url);
-        // Delete the file using the delete() method
-        fileRefDel.delete().then(function () {
-            // File deleted successfully
-            console.log("File Deleted")
-        }).catch(function (error) {
-            // Some Error occurred
-            console.log(error)
-        });
-    }
-
+    };
     const addTodo = async (event) => {
         event.preventDefault();
         /*Upload file*/
@@ -79,6 +64,22 @@ function App() {
 
         }
     }
+    const deleteTodo = async (id) => {
+        await deleteDoc(doc(db, "todos", id));
+    };
+    const editTodo = async (todo, deadline, title, details) => {
+        await updateDoc(doc(db, "todos", todo.id), {
+            deadline: toTimestamp(deadline),
+            todo: title,
+            details: details,
+        });
+    };
+    const toggleComplete = async (todo) => {
+        await updateDoc(doc(db, "todos", todo.id), {
+            isdone:!todo.isdone
+        });
+    };
+
 
   return (
     <div className="App">
@@ -96,7 +97,7 @@ function App() {
                 <button type="submit" onClick={event =>addTodo(event)}>Create todo</button>
             </form>
             <section className="App-todolist">
-                <TodoList toTimestamp={toTimestamp}/>
+                <TodoList toTimestamp={toTimestamp} deleteTodo={deleteTodo} editTodo={editTodo} toggleComplete={toggleComplete}/>
             </section>
         </main>
     </div>

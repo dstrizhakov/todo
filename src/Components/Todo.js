@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import File from "./File";
+import {storage} from "../firebase";
 
 const Todo = ({todo, deleteTodo, toggleComplete, editTodo}) => {
 
@@ -7,9 +8,6 @@ const Todo = ({todo, deleteTodo, toggleComplete, editTodo}) => {
     const [newDeadline, setNewDeadline] = useState({});
     const [newTitle, setNewTitle] = useState('New title');
     const [newDetails, setNewDetails] = useState('New details');
-    const [newFiles, setNewFiles] = useState();
-
-
 
     const setEdit = () => {
         /*Convert unix time to date*/
@@ -21,18 +19,18 @@ const Todo = ({todo, deleteTodo, toggleComplete, editTodo}) => {
             (month.toString().length === 1 ? +"0"+ month.toString() : month.toString())
             + "-" + (day.toString().length === 1 ? +"0" + day.toString(): day.toString())
 
-        /*Update new date for inputs*/
+        /*Update new data, setEdit toggle*/
         setNewDeadline(dateString);
         setNewTitle(todo.todo);
         setNewDetails(todo.details)
-
-        setEditMode((prevState)=> !prevState);
+        setEditMode(true);
     }
     const writeEdit = (e) => {
         e.preventDefault();
         editTodo(todo, newDeadline, newTitle, newDetails);
-        setEditMode((prevState)=> !prevState);
+        setEditMode(false);
     }
+
 
     return (
         <> {editMode
@@ -53,6 +51,7 @@ const Todo = ({todo, deleteTodo, toggleComplete, editTodo}) => {
                     </div>
                     <button type="submit" onClick={e => writeEdit(e)}>Save todo</button>
                 </form>
+
             </div>
             : <div></div>
         }
