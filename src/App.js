@@ -7,6 +7,7 @@ import TodoList from "./Components/TodoList";
 import { storage } from "./firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 } from "uuid";
+import File from "./Components/File";
 
 
 
@@ -17,8 +18,7 @@ function App() {
     const [file, setFile] = useState(null);
     const [todos, setTodos] = useState([]);
     const [editTodo, setEditTodo] = useState(false);
-    const [currentTodoId, setCurrentTodoId] = useState(0);
-
+    const [currentTodoRef, setCurrentTodoRef] = useState(0);
 
     useEffect(() => {
         const q = query(collection(db,"todos"));
@@ -32,7 +32,6 @@ function App() {
         })
         return () => unsub();
     }, []);
-
 
     const toTimestamp = (strDate) => {
         var datum = Date.parse(strDate);
@@ -68,7 +67,7 @@ function App() {
                 details: todoDetails,
             })
                 .then(() => {
-                    console.log('Todo submitted!' );
+                  /*  console.log('Todo submitted!');*/
                 })
                 .catch((error) => {
                     console.log(error.message);
@@ -84,7 +83,7 @@ function App() {
     };
     const updateTodo= async (event) => {
         event.preventDefault();
-        await updateDoc(doc(db, "todos", currentTodoId), {
+        await updateDoc(doc(db, "todos", currentTodoRef.id), {
             deadline: toTimestamp(todoDeadline),
             todo: todoTitle,
             details: todoDetails,
@@ -101,7 +100,7 @@ function App() {
     };
     const editCurrentTodo = (currentTodo) => {
         setEditTodo(true);
-        setCurrentTodoId(currentTodo.id)
+        setCurrentTodoRef(currentTodo)
         setFile(currentTodo.files)
         setTodoTitle(currentTodo.todo)
         setTodoDetails(currentTodo.details)
@@ -116,7 +115,7 @@ function App() {
         setTodoDeadline(dateString)
     }
 
-
+console.log(currentTodoRef);
   return (
     <div className="App">
       <header className="App-header">
@@ -128,8 +127,12 @@ function App() {
                 <textarea name="Details" value={todoDetails} onChange={(e)=> setTodoDetails(e.target.value)} placeholder="Todo details" id=""  rows="5"></textarea>
                 <div className="form-data">
                     <input type="file" onChange={ e => handleChangeFile(e)}/>
-                    <input type="date" value={todoDeadline} onChange={e => setTodoDeadline(e.target.value)}/>
+                    <div className="form-files">
+                        {(editTodo&&(currentTodoRef.files !== ""))&&<File edit={true} url={currentTodoRef.files} name="file"/>
+                        }
+                    </div>
                 </div>
+                <input type="date" value={todoDeadline} onChange={e => setTodoDeadline(e.target.value)}/>
                 {
                     editTodo
                         ?<button type="submit" onClick={event =>{updateTodo(event)}}>Update todo</button>
