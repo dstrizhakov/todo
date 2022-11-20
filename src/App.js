@@ -1,8 +1,8 @@
 import './App.less';
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {db} from "./firebase";
 import {deleteDoc, doc, onSnapshot, query, serverTimestamp, updateDoc} from "firebase/firestore";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, orderBy } from "firebase/firestore";
 import TodoList from "./Components/TodoList";
 import { storage } from "./firebase";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
@@ -20,14 +20,15 @@ function App() {
     const [editTodo, setEditTodo] = useState(false);
     const [currentTodoRef, setCurrentTodoRef] = useState(0);
 
+    const inputFileRef = useRef();
+
     useEffect(() => {
-        const q = query(collection(db,"todos"));
+        const q = query(collection(db,"todos"), orderBy('created'));
         const unsub = onSnapshot(q, (querySnapshot)=>{
             let todosArray = [];
             querySnapshot.forEach((doc)=>{
                 todosArray.push({ ...doc.data(), id: doc.id });
             });
-            todosArray = [...todosArray].sort((a,b) => a.created.seconds - b.created.seconds)
             setTodos(todosArray);
         })
         return () => unsub();
@@ -39,13 +40,13 @@ function App() {
             seconds: datum/1000,
             nanoseconds: 0
         }
-    }
+    };
     const handleChangeFile = (event) => {
             setFile(event.target.files[0]);
-    }
+    };
     const uploadFile =  async () => {
         if(file === null) {
-            return ""
+            return null
         } else {
             const path = `files/${file.name + v4()}`
             const fileRef = await ref(storage, path);
@@ -67,7 +68,7 @@ function App() {
         }).catch((error) => {
             console.log(error);
         });
-    }
+    };
     const addTodo = async (event) => {
         event.preventDefault();
         const {url, path} = await uploadFile();
@@ -89,16 +90,20 @@ function App() {
                 });
             setTodoDetails('');
             setTodoTitle('');
-            setTodoDeadline('')
-
+            setTodoDeadline('');
+            setFile(null);
+            inputFileRef.current.value = "";
         }
-    }
+    };
     const deleteTodo = async (id) => {
         await deleteDoc(doc(db, "todos", id));
     };
     const updateTodo= async (event) => {
         event.preventDefault();
+        const {url, path} = await uploadFile();
         await updateDoc(doc(db, "todos", currentTodoRef.id), {
+            fileRef: path,
+            files: url,
             deadline: toTimestamp(todoDeadline),
             todo: todoTitle,
             details: todoDetails,
@@ -128,7 +133,7 @@ function App() {
             + "-" + (day.toString().length === 1 ? +"0" + day.toString(): day.toString())
 
         setTodoDeadline(dateString)
-    }
+    };
 
   return (
     <div className="App">
@@ -140,7 +145,7 @@ function App() {
                 <input type="text" value={todoTitle} onChange={e => setTodoTitle(e.target.value)} placeholder="Todo title"/>
                 <textarea name="Details" value={todoDetails} onChange={(e)=> setTodoDetails(e.target.value)} placeholder="Todo details" id=""  rows="5"></textarea>
                 <div className="form-data">
-                    <input type="file" onChange={ e => handleChangeFile(e)}/>
+                    <input ref={inputFileRef} type="file" onChange={ e => handleChangeFile(e)}/>
                     <div>
                         {(editTodo&&(currentTodoRef.files !== ""))&&
                             <div className="form-files"> <File edit={true} url={currentTodoRef.files} name="file"/>
