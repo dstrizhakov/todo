@@ -46,7 +46,7 @@ function App() {
     };
     const uploadFile =  async () => {
         if(file === null) {
-            return null
+            return ""
         } else {
             const path = `files/${file.name + v4()}`
             const fileRef = await ref(storage, path);
@@ -54,11 +54,10 @@ function App() {
             const url = await getDownloadURL(fileRef);
             return {url, path}
         }
-
     };
     const deleteFile = async () => {
         const fileRef = await ref(storage, currentTodoRef.fileRef);
-        updateDoc(doc(db, "todos", currentTodoRef.id), {
+        await updateDoc(doc(db, "todos", currentTodoRef.id), {
             fileRef: null,
             files: "",
         });
@@ -71,7 +70,9 @@ function App() {
     };
     const addTodo = async (event) => {
         event.preventDefault();
-        const {url, path} = await uploadFile();
+        let {url, path} = await uploadFile();
+        if (!path) {path = "collection/files"; url = "";}
+        console.log(url, path)
         if(todoTitle.length > 3){
             await addDoc(collection(db, "todos"), {
                 fileRef: path,
@@ -83,7 +84,7 @@ function App() {
                 details: todoDetails,
             })
                 .then(() => {
-                  /*  console.log('Todo submitted!');*/
+                  console.log('Todo submitted!');
                 })
                 .catch((error) => {
                     console.log(error.message);
@@ -112,6 +113,8 @@ function App() {
         setTodoDetails('');
         setTodoTitle('');
         setTodoDeadline('')
+        setFile(null);
+        inputFileRef.current.value = "";
     };
     const toggleComplete = async (todo) => {
         await updateDoc(doc(db, "todos", todo.id), {
