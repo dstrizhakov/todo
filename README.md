@@ -1,8 +1,8 @@
-##Todo list with Title, Details, File, Deadline
+## Todo list with Title, Details, File, Deadline
 
-## Demo: https://todo-list-1b479.web.app/
+### Demo: https://todo-list-1b479.web.app/
 
-## GitLab: https://gitlab.com/work595/todo
+### GitLab: https://gitlab.com/work595/todo
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
