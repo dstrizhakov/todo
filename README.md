@@ -1,4 +1,4 @@
-#Todo list with Title, Details, File, Deadline
+##Todo list with Title, Details, File, Deadline
 
 ## Demo: https://todo-list-1b479.web.app/
 
